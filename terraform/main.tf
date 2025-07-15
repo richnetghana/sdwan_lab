@@ -19,7 +19,7 @@ resource "digitalocean_droplet" "sdwan" {
     inline = [
       "apt update && apt install -y docker-compose git",
       "git clone https://github.com/richnetghana/sdwan_lab.git",
-      "cd Systems-Network/sdwan-lab && docker-compose up -d"
+      "cd sdwan-lab/sdwan-lab && docker-compose up -d"
     ]
   }
 }
