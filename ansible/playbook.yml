@@ -1,0 +1,9 @@
+---
+- name: Configure FRRouting and firewall
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure FRR config is deployed
+      copy:
+        src: ./frr/frr1.conf
+        dest: /etc/frr/frr.conf
