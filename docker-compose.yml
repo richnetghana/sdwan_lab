@@ -1,0 +1,99 @@
+version: "3.8"
+
+services:
+  firewall:
+    container_name: firewall
+    entrypoint:
+    - /bin/sh
+    - /rules.sh
+    image: alpine
+    networks:
+      sdwan_net:
+        ipv4_address: 10.10.10.6
+    privileged: true
+    volumes:
+    - ./firewall/rules.sh:/rules.sh
+
+  hub:
+    container_name: hub
+    image: frrouting/frr:latest
+    networks:
+      sdwan_net:
+        ipv4_address: 10.10.10.254
+    privileged: true
+    sysctls:
+    - net.ipv4.ip_forward=1
+    volumes:
+    - ./frr/hub/frr.conf:/etc/frr/frr.conf
+    - ./frr/hub/vtysh.conf:/etc/frr/vtysh.conf
+    - ./frr/hub/daemons:/etc/frr/daemons
+
+  frr1:
+    container_name: frr1
+    image: frrouting/frr:latest
+    networks:
+      sdwan_net:
+        ipv4_address: 10.10.10.2
+    privileged: true
+    sysctls:
+    - net.ipv4.ip_forward=1
+    volumes:
+    - ./frr/frr1/frr.conf:/etc/frr/frr.conf
+    - ./frr/frr1/vtysh.conf:/etc/frr/vtysh.conf
+    - ./frr/frr1/daemons:/etc/frr/daemons
+
+  frr2:
+    container_name: frr2
+    image: frrouting/frr:latest
+    networks:
+      sdwan_net:
+        ipv4_address: 10.10.10.3
+    privileged: true
+    sysctls:
+    - net.ipv4.ip_forward=1
+    volumes:
+    - ./frr/frr2/frr.conf:/etc/frr/frr.conf
+    - ./frr/frr2/vtysh.conf:/etc/frr/vtysh.conf
+    - ./frr/frr2/daemons:/etc/frr/daemons
+
+  frr3:
+    container_name: frr3
+    image: frrouting/frr:latest
+    networks:
+      sdwan_net:
+        ipv4_address: 10.10.10.4
+    privileged: true
+    sysctls:
+    - net.ipv4.ip_forward=1
+    volumes:
+    - ./frr/frr3/frr.conf:/etc/frr/frr.conf
+    - ./frr/frr3/vtysh.conf:/etc/frr/vtysh.conf
+    - ./frr/frr3/daemons:/etc/frr/daemons
+
+  wireguard:
+    cap_add:
+    - NET_ADMIN
+    - SYS_MODULE
+    container_name: wireguard
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Etc/UTC
+    image: linuxserver/wireguard
+    networks:
+      sdwan_net:
+        ipv4_address: 10.10.10.5
+    ports:
+    - 51820:51820/udp
+    sysctls:
+    - net.ipv4.conf.all.src_valid_mark=1
+    volumes:
+    - ./wireguard:/config
+
+networks:
+  sdwan_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+
