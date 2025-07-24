@@ -11,9 +11,25 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose version
+
     - name: Validate Docker Compose
       run: docker-compose config -q
+
+    - name: Install Ansible
+      run: |
+        sudo apt update
+        sudo apt install -y ansible
+        ansible --version
+
     - name: Validate Ansible syntax
       run: ansible-playbook --syntax-check ansible/playbook.yml
